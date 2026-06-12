@@ -1,13 +1,911 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ar" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>ريادي الغد • التفكير والموازنة المالية للمبتكرين الصغار</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Cairo', 'Inter', 'system-ui', 'sans-serif'],
+              mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Custom Style Page Link -->
+    <link rel="stylesheet" href="/src/style.css" />
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Firebase Compat SDKs CDNs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen antialiased select-none font-sans overflow-x-hidden selection:bg-amber-500/30 selection:text-amber-200">
+    
+    <!-- Elegant Glow Elements -->
+    <div class="absolute -top-12 -right-12 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl -z-50 pointer-events-none"></div>
+    <div class="absolute top-[40%] -left-12 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl -z-50 pointer-events-none"></div>
+
+    <!-- Header Navigation -->
+    <header class="border-b border-slate-900 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-6 py-4">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        
+        <!-- Right side brand logo -->
+        <div class="flex items-center gap-3">
+          <div class="bg-gradient-to-br from-amber-500 to-orange-500 p-2.5 rounded-2xl shadow-lg shadow-amber-500/10 flex items-center justify-center">
+            <i data-lucide="sparkles" class="w-6 h-6 text-slate-950 animate-pulse"></i>
+          </div>
+          <div class="text-right">
+            <h1 class="text-base sm:text-lg font-black text-white leading-tight font-display tracking-tight select-all">ريادي الغد</h1>
+            <p class="text-[10px] text-slate-500 font-sans tracking-wide">الإدارة المالية والموازنة لطلاب المدارس</p>
+          </div>
+        </div>
+
+        <!-- Center View switches buttons -->
+        <nav class="flex items-center bg-slate-950 border border-slate-900 rounded-2xl p-1.5 select-none">
+          <button id="tab-btn-presentation" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/10">
+            <i data-lucide="presentation" class="w-4 h-4"></i>
+            العرض والشرائح الـ 20
+          </button>
+          <button id="tab-btn-sandbox" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            محاكي المشاريع الذكي
+          </button>
+          <button id="tab-btn-quiz" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white">
+            <i data-lucide="trophy" class="w-4 h-4"></i>
+            مسابقة تحدي المعرفة
+          </button>
+        </nav>
+
+        <!-- Left side profile stats -->
+        <div id="export-profile-mini-box" class="flex items-center gap-3 bg-slate-900/40 border border-slate-800/80 rounded-2xl p-1.5 pl-3 select-none">
+          <div class="w-8 h-8 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center">
+            <i data-lucide="user-check" class="w-4 h-4 text-slate-500"></i>
+          </div>
+          <div id="export-welcome-profile-text" class="text-right">
+            <p class="text-[10px] text-slate-500">الحالة العامة</p>
+            <p class="text-xs font-semibold text-slate-350">زائر مستكشف</p>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 pb-20">
+      
+      <!-- ================== VIEW 1: PRESENTATION & EXPORTER ================== -->
+      <section id="page-presentation" class="animate-fadeIn">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Column A (Span 9): Master Slide Player -->
+          <div class="lg:col-span-9 space-y-6">
+            
+            <!-- Dashboard Player Frame -->
+            <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              
+              <!-- Sub-Column 1: Slides Sidebar (Collapsible Index) -->
+              <div id="slides-sidebar" class="bg-slate-950/40 border border-slate-850 rounded-2xl p-4 xl:col-span-1 select-none flex flex-col h-[520px]">
+                <h3 class="text-xs font-black text-slate-300 font-display flex items-center justify-between border-b border-slate-900 pb-3 mb-3">
+                  <span class="flex items-center gap-1.5 text-[11px]"><i data-lucide="list" class="w-4 h-4 text-amber-500"></i> مخطط الـ 20 شريحة</span>
+                  <span class="text-[9px] text-slate-550 border border-slate-900 px-2 py-0.5 rounded-full">منظّم</span>
+                </h3>
+                <div id="outline-sidebar-list" class="space-y-1 overflow-y-auto flex-1 pr-0.5 pl-0.5">
+                  <!-- Sidebar indices rendered dynamically by JS -->
+                </div>
+              </div>
+
+              <!-- Sub-Column 3: PowerPoint Stage -->
+              <div id="slides-stage-container" class="xl:col-span-3 flex flex-col gap-6">
+                
+                <!-- Slide Sheet Body Frame -->
+                <div class="bg-slate-950 border border-slate-850 rounded-3xl p-6 sm:p-8 h-[380px] sm:h-[420px] flex flex-col justify-between relative overflow-hidden group shadow-2xl">
+                  
+                  <!-- Soft ambient highlights -->
+                  <div class="absolute top-0 right-0 w-64 h-64 bg-slate-900/35 rounded-full blur-3xl -z-10"></div>
+                  <div class="absolute bottom-0 left-0 w-64 h-64 bg-slate-900/35 rounded-full blur-3xl -z-10"></div>
+
+                  <!-- Header -->
+                  <div class="flex justify-between items-start border-b border-slate-900 pb-4 select-none">
+                    <div>
+                      <span id="slide-indicator-badge" class="text-[10px] font-mono text-amber-500 font-bold bg-amber-500/5 px-2.5 py-1 rounded-full border border-amber-500/10 tracking-wider">
+                        مبادرة ريادي الغد • شريحة 1 من 20
+                      </span>
+                      <h2 id="slide-main-title" class="text-base sm:text-xl md:text-2xl font-black font-display text-white mt-2.5 leading-tight select-all">
+                        مبادئ ريادة الأعمال والإدارة المالية للمشاريع
+                      </h2>
+                    </div>
+                    
+                    <button id="toggle-outline-btn" class="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-450 hover:text-white rounded-xl transition" title="تصفح قائمة الشرائح">
+                      <i data-lucide="list" class="w-4.5 h-4.5"></i>
+                    </button>
+                  </div>
+
+                  <!-- Body contents grid -->
+                  <div class="my-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-center flex-1 py-4 overflow-y-auto pr-0.5">
+                    
+                    <!-- Left paragraphs descriptions -->
+                    <div id="slide-left-content-wrapper" class="lg:col-span-7 space-y-4">
+                      <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Right interactive visualizer -->
+                    <div id="slide-right-illustration-container" class="lg:col-span-5 flex justify-center items-center h-full min-h-[160px]">
+                      <!-- Illustrated Widget HTML rendered by JS -->
+                    </div>
+
+                  </div>
+
+                  <!-- Player Controller Footer -->
+                  <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-900 select-none">
+                    
+                    <!-- Nav button arrows -->
+                    <div class="flex items-center gap-3">
+                      <button id="slide-prev-btn" class="p-3 bg-slate-900 hover:bg-slate-850 text-slate-200 hover:text-white rounded-2xl border border-slate-800 hover:border-slate-700 transition" title="الشريحة السابقة (السهم الأيمن)">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                      </button>
+                      
+                      <div id="slide-indicator-counter" class="font-mono text-xs text-slate-400 font-bold bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-900 select-all">
+                        الشريحة <b class="text-white">1</b> / 20
+                      </div>
+
+                      <button id="slide-next-btn" class="p-3 bg-slate-900 hover:bg-slate-850 text-slate-200 hover:text-white rounded-2xl border border-slate-800 hover:border-slate-700 transition" title="الشريحة التالية (السهم الأيسر أو زر المسافة)">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                      </button>
+                    </div>
+
+                    <!-- Play/Pause Autoplayer bar -->
+                    <div class="flex items-center gap-2.5">
+                      <button id="slide-autoplay-btn" class="py-2 px-4 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 animate-pulse">
+                        <i data-lucide="play" class="w-4 h-4"></i>
+                        تشغيل الشرح التلقائي (أوتوبلاي)
+                      </button>
+                      
+                      <div id="autoplay-delay-container" class="hidden">
+                        <select id="autoplay-delay-select" class="bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-400 outline-none">
+                          <option value="3000">3 ثواني</option>
+                          <option value="5000" selected>5 ثواني</option>
+                          <option value="10000">10 ثواني</option>
+                          <option value="15000">15 ثانية</option>
+                        </select>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Dr. Trainer Notes Drawer -->
+            <div class="bg-slate-900/40 border border-slate-850 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+              <div class="flex justify-between items-center mb-4 border-b border-slate-800/60 pb-3 select-none">
+                <h3 class="text-xs sm:text-sm font-black text-slate-200 font-display flex items-center gap-2">
+                  <i data-lucide="book-open" class="text-amber-500 w-5 h-5"></i>
+                  إضاءات وملاحظات مرجعية للمدرب الخاص بالورشة الدراسية
+                </h3>
+                <button id="toggle-notes-btn" class="text-amber-500 hover:text-amber-400 text-xs font-black bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/10 transition">
+                  إخفاء التفاصيل
+                </button>
+              </div>
+
+              <div id="notes-body-drawer" class="animate-fadeIn">
+                <div id="notes-content-box" class="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans text-right select-text">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Column B (Span 3): Cloud Exporter Box -->
+          <div class="lg:col-span-3 space-y-6">
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-850 p-5 rounded-3xl shadow-xl select-none relative overflow-hidden">
+              
+              <!-- Top Header -->
+              <div class="flex items-center gap-2 mb-3">
+                <div class="bg-amber-504/10 p-1.5 rounded-lg border border-amber-500/15">
+                  <i data-lucide="presentation" class="w-4 h-4 text-amber-500"></i>
+                </div>
+                <div>
+                  <h3 class="text-xs font-black text-slate-200">المصدّر لشرائح Google Slides</h3>
+                  <p class="text-[9px] text-slate-500 mt-0.5">تصميم وحفظ تلقائي بالكامل في سحابتك</p>
+                </div>
+              </div>
+
+              <!-- Info hint -->
+              <p class="text-[10px] text-slate-400 leading-relaxed bg-slate-950/50 p-3 rounded-xl border border-slate-900">
+                يمكنك تصدير كشاف الشرائح الـ 20 بنسخة تفصيلية فخمة باسمك في حسابك على Google بلمسة زر واحدة ومتابعة العرض بالمدرسة!
+              </p>
+
+              <!-- Auth Section -->
+              <div class="space-y-4 pt-3">
+                
+                <!-- Flow A: Login Action -->
+                <div id="export-auth-required-section" class="hidden animate-fadeIn text-center py-4">
+                  <button id="google-login-btn" class="gsi-material-button w-full">
+                    <div class="gsi-material-button-content-wrapper">
+                      <svg class="gsi-material-button-icon" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.5 24c0-1.55-.15-3.24-.45-4.77H24v9.03h12.75c-.55 2.85-2.17 5.27-4.59 6.89l7.15 5.53C43.46 36.57 46.5 30.82 46.5 24z"/>
+                        <path fill="#FBBC05" d="M10.54 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.98-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.15-5.53c-2.1 1.41-4.76 2.24-8.74 2.24-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                      </svg>
+                      <span class="gsi-material-button-contents">الدخول والمشاركة بحساب Google</span>
+                    </div>
+                  </button>
+                </div>
+
+                <!-- Flow B: Theme selections + Action btn -->
+                <div id="export-logged-in-section" class="hidden space-y-4 animate-fadeIn">
+                  
+                  <div class="border-t border-slate-900 pt-3">
+                    <label class="text-[10px] text-slate-500 block mb-2 font-bold font-sans">اختر ثيم الألوان والشرائح المفضل:</label>
+                    
+                    <div class="space-y-1.5">
+                      <!-- Blue theme wrapper -->
+                      <button id="theme-chip-navy_royal" class="w-full border border-amber-500 bg-amber-500/5 text-slate-200 text-xs text-right p-3 rounded-xl flex items-center justify-between select-none hover:bg-slate-900/60 transition">
+                        <span class="font-bold">أزرق ملكي وذهبي دافئ 💎</span>
+                        <div class="flex gap-1.5">
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#0f172a] border border-slate-800"></span>
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#f59e0b] border border-slate-800"></span>
+                        </div>
+                      </button>
+
+                      <!-- Sunset theme wrapper -->
+                      <button id="theme-chip-sunset_glow" class="w-full border border-slate-800 bg-slate-900/40 text-slate-200 text-xs text-right p-3 rounded-xl flex items-center justify-between select-none hover:bg-slate-900/60 transition">
+                        <span class="font-bold">غروب ريادي دافئ 🌅</span>
+                        <div class="flex gap-1.5">
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#2e1214] border border-slate-850"></span>
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#f97316] border border-slate-850"></span>
+                        </div>
+                      </button>
+
+                      <!-- Green theme wrapper -->
+                      <button id="theme-chip-emerald_modern" class="w-full border border-slate-800 bg-slate-900/40 text-slate-200 text-xs text-right p-3 rounded-xl flex items-center justify-between select-none hover:bg-slate-900/60 transition">
+                        <span class="font-bold">أخضر زمردي حديث 🌿</span>
+                        <div class="flex gap-1.5">
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#06201b] border border-slate-850"></span>
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#10b981] border border-slate-850"></span>
+                        </div>
+                      </button>
+
+                      <!-- Charcoal theme wrapper -->
+                      <button id="theme-chip-clean_charcoal" class="w-full border border-slate-800 bg-slate-900/40 text-slate-200 text-xs text-right p-3 rounded-xl flex items-center justify-between select-none hover:bg-slate-900/60 transition">
+                        <span class="font-bold">رمادي فحمي رصين 🏢</span>
+                        <div class="flex gap-1.5">
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#1e1e22] border border-slate-850"></span>
+                          <span class="w-3.5 h-3.5 rounded-full bg-[#ffffff] border border-slate-850"></span>
+                        </div>
+                      </button>
+                    </div>
+
+                  </div>
+
+                  <!-- Action controller loading boxes -->
+                  <div id="export-status-panel-wrapper" class="border-t border-slate-900 pt-3.5">
+                    <!-- Dynamic state rendered by JS -->
+                  </div>
+
+                  <div class="flex justify-between items-center text-[9px] text-slate-550 pt-1">
+                    <span>تأمين ببروتوكولات التخزين والمشاريع</span>
+                    <button id="google-logout-btn" class="text-slate-500 hover:text-red-400 font-semibold transition">تسجيل الخروج</button>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================== VIEW 2: PROJECT SANDBOX SIMULATOR ================== -->
+      <section id="page-sandbox" class="hidden">
+        <div class="bg-slate-950 border border-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          
+          <!-- Secondary steps list navigation bar -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-4 mb-8 border-b border-slate-900 scrollbar-none select-none">
+            <button id="step-lnk-brainstorm" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/10">
+              <span class="w-5 h-5 rounded-lg bg-black/10 flex items-center justify-center text-[10px] sm:text-xs">١</span>
+              بلورة فكرة المشروع
+            </button>
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-slate-700 flex-shrink-0"></i>
+            <button id="step-lnk-capital" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-900">
+              <span class="w-5 h-5 rounded-lg bg-slate-950 border border-slate-850 flex items-center justify-center text-[10px] sm:text-xs">٢</span>
+              رأس مال الدفعة الأولى
+            </button>
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-slate-700 flex-shrink-0"></i>
+            <button id="step-lnk-pricing" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-900">
+              <span class="w-5 h-5 rounded-lg bg-slate-950 border border-slate-850 flex items-center justify-center text-[10px] sm:text-xs">٣</span>
+              سعر البيع وعرض السوق
+            </button>
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-slate-700 flex-shrink-0"></i>
+            <button id="step-lnk-simulator" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-900">
+              <span class="w-5 h-5 rounded-lg bg-slate-950 border border-slate-850 flex items-center justify-center text-[10px] sm:text-xs">٤</span>
+              محاكاة البازار
+            </button>
+            <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-slate-700 flex-shrink-0"></i>
+            <button id="step-lnk-results" class="py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-900">
+              <span class="w-5 h-5 rounded-lg bg-slate-950 border border-slate-850 flex items-center justify-center text-[10px] sm:text-xs">٥</span>
+              دفتر التقارير المالي
+            </button>
+          </div>
+
+          <!-- Sandbox Content Pages -->
+          
+          <!-- STEP 2.A: Brainstorm & Idea Selection -->
+          <div id="step-pan-brainstorm" class="space-y-6">
+            <div class="max-w-2xl text-right space-y-2 select-none">
+              <h3 class="text-base sm:text-xl font-black text-white">اختر فكرة مشروع البداية</h3>
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed font-sans">لقد قمنا بتوفير 4 قوالب ملائمة لطلاب المدرسة بمكونات وأسعار بسيطة، اختر أحدها أو اكتب فكرتك الخاصة بالأسفل!</p>
+            </div>
+
+            <!-- Predefined template cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 select-none">
+              <button class="sandbox-idea-card p-5 rounded-2xl border text-right transition flex flex-col justify-between h-44 group border-amber-500 bg-amber-500/5 shadow-lg shadow-amber-500/5" data-id="cups">
+                <span class="text-3xl">🎨</span>
+                <div>
+                  <h4 class="font-extrabold text-sm text-slate-100 group-hover:text-amber-400 transition">أكواب ورقية مصممة يدوياً</h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-sans">فنون وأشغال يدوية • سعر مقترح: 2 ريال</p>
+                </div>
+              </button>
+
+              <button class="sandbox-idea-card p-5 rounded-2xl border text-right transition flex flex-col justify-between h-44 group border-slate-800 bg-slate-900/40 hover:border-slate-705/80" data-id="bracelets">
+                <span class="text-3xl">🧵</span>
+                <div>
+                  <h4 class="font-extrabold text-sm text-slate-100 group-hover:text-amber-400 transition">أساور خيطية ملونة مخصصة</h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-sans">إكسسوارات وهدايا • سعر مقترح: 1.5 ريال</p>
+                </div>
+              </button>
+
+              <button class="sandbox-idea-card p-5 rounded-2xl border text-right transition flex flex-col justify-between h-44 group border-slate-800 bg-slate-900/40 hover:border-slate-705/80" data-id="juice">
+                <span class="text-3xl">🍋</span>
+                <div>
+                  <h4 class="font-extrabold text-sm text-slate-100 group-hover:text-amber-400 transition">أكياس عصير ليمون ونعناع مثلج</h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-sans">أغذية ومشروبات • سعر مقترح: 2.5 ريال</p>
+                </div>
+              </button>
+
+              <button class="sandbox-idea-card p-5 rounded-2xl border text-right transition flex flex-col justify-between h-44 group border-slate-800 bg-slate-900/40 hover:border-slate-705/80" data-id="stickers">
+                <span class="text-3xl">💻</span>
+                <div>
+                  <h4 class="font-extrabold text-sm text-slate-100 group-hover:text-amber-400 transition">ملصقات (استيكرز) للدفاتر</h4>
+                  <p class="text-[10px] text-slate-500 mt-1 font-sans">مطبوعات ورسومات • سعر مقترح: 1 ريال</p>
+                </div>
+              </button>
+            </div>
+
+            <!-- Custom Project inputs -->
+            <div class="bg-slate-900/40 border border-slate-850 p-5 rounded-2xl max-w-2xl">
+              <h4 class="text-xs sm:text-sm font-black text-slate-200 mb-4 flex items-center gap-1.5 select-none"><i data-lucide="edit-3" class="w-4.5 h-4.5 text-amber-500"></i> أو قم بصياغة فكرة مشروع مبتكرة مخصصة:</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="text-[11px] text-slate-500 font-bold block select-none">اسم مشروعك الجديد:</label>
+                  <input type="text" id="sandbox-custom-name" placeholder="مثلاً: متجر بسكويت منزلي دافئ" class="w-full bg-slate-950 border border-slate-850 px-4 py-3 rounded-xl text-xs sm:text-sm text-slate-100 font-semibold outline-none transition" />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-[11px] text-slate-500 font-bold block select-none">تصنيف ونوع القسم المالي:</label>
+                  <input type="text" id="sandbox-custom-category" placeholder="مثلاً: أغذية ومطبوخات" class="w-full bg-slate-950 border border-slate-850 px-4 py-3 rounded-xl text-xs sm:text-sm text-slate-100 font-semibold outline-none transition" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer navigation actions -->
+            <div class="flex justify-end pt-4 border-t border-slate-900/40 select-none">
+              <button id="btn-next-capital" class="bg-amber-500 text-slate-950 font-bold hover:opacity-90 rounded-xl px-5 py-3 text-xs sm:text-sm transition flex items-center gap-1.5 shadow-md shadow-amber-500/10">
+                المرور لحساب رأس مال الدفعة
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 2.B: Capital budget planner -->
+          <div id="step-pan-capital" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              
+              <!-- Left list materials Column -->
+              <div class="lg:col-span-7 space-y-4">
+                <div class="flex justify-between items-center mb-1 select-none">
+                  <div>
+                    <h3 class="text-sm sm:text-base font-black text-slate-200">الخامات والمواد الخام المطلوبة للبداية</h3>
+                    <p class="text-[10px] text-slate-500 font-sans">تطوير مستمر لقوائم الخزينة لدفعتك الأولى</p>
+                  </div>
+                </div>
+
+                <!-- Live Container listed items -->
+                <div id="sandbox-materials-list-root" class="space-y-2 max-h-[300px] overflow-y-auto pr-0.5">
+                  <!-- JS appends dynamically -->
+                </div>
+
+                <!-- Add new material drawer -->
+                <div class="bg-slate-900/60 border border-slate-850 p-4.5 rounded-2xl space-y-4">
+                  <h4 class="text-[11px] text-slate-400 font-black flex items-center gap-1.5 select-none"><i data-lucide="plus-circle" class="w-4 h-4 text-amber-500"></i> أضف خامة أساسية جديدة للقائمة:</h4>
+                  <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                    <input type="text" id="sandbox-material-name" placeholder="مثال: علبة قش بلاستيكي" class="sm:col-span-7 bg-slate-950 border border-slate-850 px-3.5 py-3 rounded-xl text-xs font-semibold text-slate-100 outline-none transition" />
+                    <input type="number" step="0.5" id="sandbox-material-cost" placeholder="الميزانية (ريال)" class="sm:col-span-3 bg-slate-950 border border-slate-850 px-3.5 py-3 rounded-xl text-xs font-semibold text-slate-100 outline-none transition text-center" />
+                    <button id="sandbox-add-material-btn" class="sm:col-span-2 bg-slate-100 hover:bg-white text-slate-950 rounded-xl font-bold text-xs transition py-3">إضافة</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right batch sizing options -->
+              <div class="lg:col-span-5 space-y-6">
+                
+                <div class="bg-slate-900/40 border border-slate-850 p-5 rounded-2xl space-y-4 select-none">
+                  <h4 class="text-xs sm:text-sm font-black text-slate-200 flex items-center gap-1.5">
+                    <i data-lucide="boxes" class="w-4.5 h-4.5 text-amber-500"></i>
+                    تحديد مجهود وكمية الإنتاج للدفعة الأولى:
+                  </h4>
+                  
+                  <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs text-slate-400">
+                      <span>إجمالي عدد قطع البضاعة المنتجة:</span>
+                      <span id="sandbox-batch-val-display" class="text-amber-500 font-bold font-mono">20 وحدة</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="5"
+                      max="100"
+                      step="5"
+                      id="sandbox-batch-slider"
+                      value="20"
+                      class="w-full h-1.5 bg-slate-950 appearance-none rounded-lg cursor-pointer accent-amber-500"
+                    />
+                  </div>
+
+                  <p class="text-[9.5px] text-slate-500 leading-relaxed font-sans pt-1">
+                    * ملاحظة ريادية: زيادة الكمية يوزع تكلفة رأس المال على الحبات ويقلل تكلفة صنع الحبة الواحدة، ولكنه يتطلب رأسمال بدء كافي ومبيعات مضمونة.
+                  </p>
+                </div>
+
+                <!-- Real-time computing display card -->
+                <div class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-850 p-5 rounded-2xl space-y-4 shadow-lg select-none">
+                  <h4 class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">مخرجات الحسابات المالية التلقائية:</h4>
+                  
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-900">
+                      <span class="text-[10px] text-slate-500 block mb-1">إجمالي رأس المال:</span>
+                      <span id="calc-capital-total" class="text-base font-black font-mono text-slate-100">0.0 ريال</span>
+                    </div>
+                    <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-900">
+                      <span class="text-[10px] text-slate-500 block mb-1">تكلفة صنع الحبة:</span>
+                      <span id="calc-per-unit-cost" class="text-base font-black font-mono text-rose-400">0.0 ريال</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Footer Navigation -->
+            <div class="flex justify-between pt-4 border-t border-slate-900/40 select-none">
+              <button onclick="switchSandboxTab('brainstorm')" class="border border-slate-800 text-slate-400 hover:text-white rounded-xl px-5 py-3 text-xs transition">رجوع للخلف</button>
+              <button id="btn-next-pricing" class="bg-amber-500 text-slate-950 font-bold hover:opacity-90 rounded-xl px-5 py-3 text-xs sm:text-sm transition flex items-center gap-1.5 shadow-md shadow-amber-500/10">
+                تسعير المنتج ودراسة الزبائن
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 2.C: Sizing, Pricing & Charting -->
+          <div id="step-pan-pricing" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              
+              <!-- Left side sliders -->
+              <div class="lg:col-span-5 space-y-5 select-none">
+                
+                <div class="bg-slate-900/40 border border-slate-850 p-5 rounded-2xl space-y-4">
+                  <h3 class="text-xs sm:text-sm font-black text-slate-200 flex items-center gap-1.5">
+                    <i data-lucide="tag" class="w-4.5 h-4.5 text-amber-500"></i>
+                    صياغة سعر بيع المنتج للطلاب:
+                  </h3>
+                  
+                  <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs text-slate-450">
+                      <span>سعر البيع المقترح للجمهور:</span>
+                      <span id="sandbox-price-val-display" class="text-amber-500 font-extrabold font-mono">2.00 ر.س</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="10"
+                      step="0.1"
+                      id="sandbox-price-slider"
+                      value="2"
+                      class="w-full h-1.5 bg-slate-950 appearance-none rounded-lg cursor-pointer accent-amber-500"
+                    />
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/40 border border-slate-850 p-5 rounded-2xl space-y-4.5">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="users" class="text-amber-500 w-4.5 h-4.5"></i>
+                    <h3 class="text-xs sm:text-sm font-black text-slate-200">نتائج استطلاع ومقاييس زملائك بالفسحة:</h3>
+                  </div>
+
+                  <div class="space-y-4 pt-1">
+                    <div class="space-y-2">
+                      <div class="flex justify-between items-center text-[11px] text-slate-500 font-semibold">
+                        <span>عدد الفتية المهتمين بالشراء بالصف (من ٥ مستطلَعين):</span>
+                        <span id="sandbox-interest-val-display" class="text-cyan-400 font-bold font-mono">4 مهتمين</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="5"
+                        step="1"
+                        id="sandbox-interest-slider"
+                        value="4"
+                        class="w-full h-1.5 bg-slate-950 appearance-none rounded-lg cursor-pointer accent-cyan-500"
+                      />
+                    </div>
+
+                    <div class="space-y-2">
+                      <div class="flex justify-between items-center text-[11px] text-slate-500 font-semibold">
+                        <span>معيار السعر المقبول للعامة زملائك:</span>
+                        <span id="sandbox-props-price-val-display" class="text-cyan-400 font-bold font-mono">2.00 ر.س</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="8"
+                        step="0.1"
+                        id="sandbox-props-price-slider"
+                        value="2"
+                        class="w-full h-1.5 bg-slate-950 appearance-none rounded-lg cursor-pointer accent-cyan-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dynamic pricing output metrics -->
+                <div class="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-850 p-4.5 rounded-2xl flex justify-between items-center">
+                  <div>
+                    <span class="text-[9.5px] text-slate-500 block">صافي هامش الربح للحبة الواحدة:</span>
+                    <span id="calc-profit-margin" class="text-lg font-black text-emerald-400 font-mono bg-emerald-500/5 px-2.5 py-1 rounded-lg border border-emerald-500/10 mt-1 block">0.00 ريال</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-[9.5px] text-slate-500 block">نسبة هامش الربحية لشركتك:</span>
+                    <span id="calc-profit-margin-percentage" class="text-base font-extrabold font-mono text-emerald-400 block mt-1">0%</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Right Spectrum graphs Column -->
+              <div class="lg:col-span-7 space-y-4">
+                <div class="bg-slate-900/60 border border-slate-850 p-5 rounded-2xl h-[335px] flex flex-col justify-between">
+                  <div class="select-none.">
+                    <h3 class="text-xs sm:text-sm font-black text-slate-250 flex items-center gap-1.5"><i data-lucide="trending-up" class="w-4 h-4 text-emerald-450"></i> منحنى الربحية ومعدلات الإيراد المفترضة</h3>
+                    <p class="text-[9.5px] text-slate-550 font-sans mt-0.5">يتتبع تقاطع تسعير اليوم وتأثيره على الطلب الصفي لدفعتك بالكامل</p>
+                  </div>
+                  
+                  <div class="flex-1 w-full relative min-h-[220px]">
+                    <canvas id="pricing-spectrum-canvas" class="w-full h-full"></canvas>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Footer navigation directions -->
+            <div class="flex justify-between pt-4 border-t border-slate-900/40 select-none">
+              <button onclick="switchSandboxTab('capital')" class="border border-slate-800 text-slate-400 hover:text-white rounded-xl px-5 py-3 text-xs transition">رجوع للخلف</button>
+              <button id="btn-next-simulator" class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black hover:opacity-95 rounded-xl px-6 py-3.5 text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-amber-500/10">
+                تشغيل محاكاة بازار المدرسة خمسة أيام!
+                <i data-lucide="play" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 2.D: Simulator Loader -->
+          <div id="step-pan-simulator" class="hidden py-12 text-center select-none">
+            
+            <!-- Play layout screen component -->
+            <div id="launcher-play-intro" class="max-w-md mx-auto space-y-6 py-4 animate-fadeIn">
+              <div class="w-20 h-20 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-3xl flex items-center justify-center text-4xl mx-auto shadow-xl shadow-amber-500/10 animate-bounce">
+                🏫
+              </div>
+              <div class="space-y-2">
+                <h3 class="text-lg sm:text-2xl font-black text-white">هل أنت مستعد لقيادة البازار؟</h3>
+                <p class="text-xs sm:text-sm text-slate-400 font-sans leading-relaxed">
+                  سوف نقوم بمحاكاة مبيعات مشروعك على مدار خمسة أيام دراسية، في كل يوم سوف يمر بظروف ومفارقات حقيقية بالفسحة لتقيس مهاراتك القيادية وحساباتك!
+                </p>
+              </div>
+
+              <!-- Live helper metrics chip before launching -->
+              <div class="bg-slate-900/50 border border-slate-850 p-4.5 rounded-2xl text-right text-xs space-y-2 max-w-sm mx-auto">
+                <div class="flex justify-between text-slate-400"><span>المشروع الحالي:</span><b id="sim-helper-proj-name" class="text-slate-100 font-sans">أكواب ورقية</b></div>
+                <div class="flex justify-between text-slate-400"><span>الإنتاج (الدفعة الأولى):</span><b id="sim-helper-batch-size" class="text-slate-100 font-mono">20 حبة</b></div>
+                <div class="flex justify-between text-slate-400"><span>سعر بیع الحبة:</span><b id="sim-helper-price" class="text-emerald-450 font-mono">2 ريال</b></div>
+                <div class="flex justify-between text-slate-400"><span>تكلفة الخامات للحبة:</span><b id="sim-helper-unit-cost" class="text-rose-400 font-mono">1.25 ريال</b></div>
+              </div>
+
+              <div class="pt-2">
+                <button id="sandbox-launch-sim-btn" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-extrabold transition-all py-4 px-6 rounded-2xl shadow-xl shadow-amber-500/15 flex items-center justify-center gap-2 text-sm">
+                  البدء بحساب المبيعات الآن! 🚀
+                </button>
+              </div>
+            </div>
+
+            <!-- Active simulations status screen -->
+            <div id="launcher-active-sim-view" class="hidden max-w-sm mx-auto space-y-6 pt-10 pb-6 animate-fadeIn">
+              <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+                <div class="absolute inset-0 border-[3px] border-slate-900 rounded-full"></div>
+                <div class="absolute inset-0 border-[3px] border-amber-500 rounded-full border-t-transparent animate-spin"></div>
+                <span class="text-2xl animate-pulse">🧭</span>
+              </div>
+              <div class="space-y-2">
+                <h4 class="text-base sm:text-lg font-black text-amber-500 animate-pulse">جاري محاكاة حركة الفسحة المدرسية...</h4>
+                <p class="text-[10px] sm:text-xs text-slate-450 font-sans leading-relaxed">
+                  توزيع الإيرادات الكلية، فرز المصروفات المباشرة، وحصر العوامل المنافسة...
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- STEP 2.E: Simulation spreadsheet report & charts -->
+          <div id="step-pan-results" class="hidden space-y-6">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              
+              <!-- Column 1 (Span 4): Financial ledger summaries -->
+              <div class="lg:col-span-4 space-y-5">
+                <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-850 p-5 rounded-3xl shadow-xl relative overflow-hidden select-none">
+                  
+                  <div class="flex items-center gap-2.5 mb-4 border-b border-slate-850 pb-3">
+                    <div class="bg-amber-500/10 p-1.5 rounded-lg border border-amber-500/15">
+                      <span class="text-lg">💰</span>
+                    </div>
+                    <div>
+                      <h3 class="text-xs font-black text-slate-200">الرصيد الكلي في حصالة المشروع</h3>
+                      <p class="text-[9px] text-slate-500">نتيجة تراكمات وتصفية خمسة أيام بازار</p>
+                    </div>
+                  </div>
+
+                  <div class="text-center py-4 bg-slate-950/60 rounded-2xl border border-slate-900/60 my-3">
+                    <span class="text-[9.5px] text-slate-550 block font-bold uppercase tracking-wider font-sans">صافي أرباح مشروع صيدك الصفي:</span>
+                    <b id="res-total-net-profit" class="text-3xl font-black font-mono mt-1 block text-emerald-400">+15.0 ر.س</b>
+                  </div>
+
+                  <div class="pt-4 space-y-2.5 text-xs">
+                    <div class="flex justify-between text-slate-450">
+                      <span>إجمالي الكمية المصنعة:</span>
+                      <span id="res-total-produced" class="font-mono text-slate-200 font-bold">20 حبة</span>
+                    </div>
+                    <div class="flex justify-between text-slate-450">
+                      <span>إجمالي المنتجات المباعة:</span>
+                      <span id="res-total-sold" class="font-mono text-slate-200 font-bold">18 حبة</span>
+                    </div>
+                    <div class="flex justify-between text-slate-450">
+                      <span>الإيرادات الإجمالية المحصلة:</span>
+                      <span id="res-total-revenues" class="font-mono text-cyan-400 font-bold">36.0 ر.س</span>
+                    </div>
+                  </div>
+
+                  <div class="pt-5 flex gap-2">
+                    <button id="results-retry-sim-btn" class="flex-1 bg-amber-500 text-slate-950 text-xs font-black transition-all py-3 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-amber-505/10">
+                      <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                      إطلاق مشروع جديد
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Cumulative Chart balance canvas -->
+                <div class="bg-slate-900/50 border border-slate-850 p-5 rounded-2xl h-[230px] flex flex-col justify-between">
+                  <div class="select-none">
+                    <h4 class="text-xs font-black text-slate-350 flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5 text-amber-505"></i> مخطط نمو وتراكم رصيد الأرباح</h4>
+                  </div>
+                  <div class="flex-1 w-full relative min-h-[160px] pt-2">
+                    <canvas id="results-balancechart-canvas" class="w-full h-full"></canvas>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Column 2 (Span 8): Tables ledger spreadsheet & indicators -->
+              <div class="lg:col-span-8 space-y-6">
+                
+                <!-- Table ledger frame -->
+                <div class="bg-slate-900/40 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
+                  <div class="p-4 border-b border-slate-850 select-none">
+                    <h3 class="text-xs sm:text-sm font-black text-slate-200 flex items-center gap-1.5">
+                      <i data-lucide="table" class="w-4.5 h-4.5 text-amber-500"></i>
+                      دفتر تسجيل الحسابات الدفتري الصفي لمشروعك
+                    </h3>
+                  </div>
+
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-right table-auto border-collapse text-xs sm:text-sm">
+                      <thead>
+                        <tr class="bg-slate-950 text-slate-500 text-[10px] uppercase font-mono font-bold select-none text-right">
+                          <th class="p-4">اليوم الدراسي</th>
+                          <th class="p-4">اسم السلعة</th>
+                          <th class="p-4">العامل أو حدث الفسحة</th>
+                          <th class="p-4">الإيراد اليومي</th>
+                          <th class="p-4">تكاليف اليوم</th>
+                          <th class="p-4">الربح الصافي</th>
+                        </tr>
+                      </thead>
+                      <tbody id="results-ledger-rows-container">
+                        <!-- Dynamic spreadsheet rows appended -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Days comparison sidebar chart -->
+                <div class="bg-slate-900/50 border border-slate-850 p-5 rounded-2xl h-[250px] flex flex-col justify-between">
+                  <div class="select-none">
+                    <h4 class="text-xs font-black text-slate-350 flex items-center gap-1.5"><i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-450"></i> مؤشر الإيرادات وصافي الأرباح لليوم</h4>
+                  </div>
+                  <div class="flex-1 w-full relative min-h-[185px] pt-1">
+                    <canvas id="results-dayschart-canvas" class="w-full h-full"></canvas>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================== VIEW 3: GAMIFIED QUIZ ================== -->
+      <section id="page-quiz" class="hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Column A (Span 8): Quiz Sheets Active Panels -->
+          <div class="lg:col-span-8 space-y-6">
+            
+            <!-- STAGE 1: Starting Cover Panel -->
+            <div id="quiz-start-screen-card" class="bg-slate-950 border border-slate-900 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl relative overflow-hidden select-none py-12 animate-fadeIn">
+              <div class="w-20 h-20 bg-gradient-to-br from-amber-550 to-orange-500 hover:scale-101 transition p-5 rounded-3xl flex items-center justify-center text-4xl mx-auto shadow-xl shadow-amber-500/10">
+                🏆
+              </div>
+              <div class="space-y-2.5 max-w-lg mx-auto">
+                <h3 class="text-lg sm:text-2xl font-black text-white leading-tight">تغلب في تحدي رواد الأعمال الصغار!</h3>
+                <p class="text-xs sm:text-base text-slate-400 font-sans leading-relaxed">
+                  اختبر معلوماتك الريادية والحسابية التي مرت معنا بورشة اليوم، واحصل على شارات وبادجات رائد الأعمال المتألق!
+                </p>
+              </div>
+
+              <!-- Brief instructions -->
+              <div class="bg-slate-900/50 border border-slate-850 p-4.5 rounded-2xl text-right text-xs max-w-sm mx-auto space-y-2 font-sans">
+                <div class="flex items-center gap-2 text-slate-350"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> <b>٥ أسئلة سيناريوهات حقيقية</b> مجهزة لطلاب عمر ١٤ سنة</div>
+                <div class="flex items-center gap-2 text-slate-350"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> <b>شارات إنجاز لفتحها</b> بنسب الحسابات الدقيقة</div>
+                <div class="flex items-center gap-2 text-slate-350"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> <b>تحليلات مرجعية تفصيلية</b> لتصحيح كل إجابة ومعيار</div>
+              </div>
+
+              <div class="pt-2">
+                <button id="quiz-start-action-btn" class="w-64 max-w-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black py-3.5 rounded-2xl shadow-xl shadow-amber-500/15 transition-all text-sm">
+                  البدء في المسابقة الصفيّة الممتعة 🌟
+                </button>
+              </div>
+            </div>
+
+            <!-- STAGE 2: Active Question Sheet -->
+            <div id="quiz-active-screen-card" class="bg-slate-950 border border-slate-900 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl hidden relative overflow-hidden">
+              
+              <!-- Indicator Header -->
+              <div class="flex justify-between items-center border-b border-slate-900 pb-4 select-none">
+                <div>
+                  <span id="quiz-step-counter-badge" class="text-[10px] font-mono text-amber-500 font-bold bg-amber-500/5 px-2.5 py-1 rounded-full border border-amber-500/10 tracking-wider">
+                    السؤال 1 من 5
+                  </span>
+                  <h3 id="quiz-question-title" class="text-sm sm:text-base font-black text-white mt-3 leading-relaxed flex items-center pr-0.5 select-text">
+                    السوار الجلدي في معصم اليد تكلفنا خاماته (0.5 ريال) وقررنا بيعه بـ (1.5 ريال)، فكم تبلغ قيمة هامش ربحنا الصافي للكوب الواحد؟
+                  </h3>
+                </div>
+              </div>
+
+              <!-- Options buttons wrapper -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5" id="quiz-options-container">
+                <!-- JS populates dynamic options options here -->
+              </div>
+
+              <!-- Explanation review card -->
+              <div id="quiz-explanation-box-wrap" class="select-none">
+                <!-- JS renders comments on submission -->
+              </div>
+
+              <!-- Controlling bar -->
+              <div class="flex justify-between items-center pt-4 border-t border-slate-905 select-none">
+                <button id="quiz-verify-action-btn" class="bg-amber-500 font-black text-slate-950 px-5 py-3 text-xs sm:text-sm rounded-xl hover:opacity-90 transition shadow-md shadow-amber-500/10" disabled>
+                  تأكيد الإجابة ومراجعة النتيجة
+                </button>
+                <button id="quiz-next-action-btn" class="hidden bg-gradient-to-r from-amber-500 to-orange-500 font-black text-slate-950 px-5 py-3 text-xs sm:text-sm rounded-xl hover:opacity-95 transition shadow-lg flex items-center gap-1.5">
+                  المرور للسؤال التالي
+                  <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- STAGE 3: Quiz Finished Trophy card -->
+            <div id="quiz-finished-screen-card" class="bg-slate-950 border border-slate-900 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl hidden relative overflow-hidden select-none py-12">
+              <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
+                <span class="text-6xl animate-pulse">🎓 🏆</span>
+              </div>
+              <div class="space-y-2">
+                <h3 class="text-lg sm:text-2xl font-black text-white leading-tight">مبارك لكم إتلاف العقبات والمساهمة الصفيّة!</h3>
+                <p class="text-xs sm:text-sm text-slate-400 font-sans leading-relaxed">لقد أكملت ورشة اليوم المالي بنجاح تام وبصياغة فخر حقيقية!</p>
+              </div>
+
+              <div class="bg-slate-900/60 border border-slate-850 p-5 rounded-2xl max-w-sm mx-auto my-4 text-center">
+                <span class="text-[9px] text-slate-500 block">حصيلة إجاباتك الصحيحة بالمسابقة:</span>
+                <b id="quiz-final-score-text" class="text-3xl font-black text-amber-500 font-mono mt-1 block">5 / 5</b>
+                <p class="text-[9px] text-emerald-400 font-sans mt-2 font-bold leading-relaxed">تم فتح الشارات والبادجات الريادية المقابلة لأول تجربة ناجحة لصيدك المالي!</p>
+              </div>
+
+              <div class="flex justify-center gap-3 max-w-xs mx-auto">
+                <button id="quiz-restart-action-btn" class="flex-grow bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-xl py-3.5 text-xs font-black transition">إعادة المحاولة</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Column B (Span 4): unlocked badging tray -->
+          <div class="lg:col-span-4 space-y-6">
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-850 p-5 rounded-3xl shadow-xl select-none relative overflow-hidden">
+              
+              <div class="flex items-center gap-2.5 mb-4 border-b border-slate-850 pb-3">
+                <div class="bg-amber-504/10 p-1.5 rounded-lg border border-amber-550/15">
+                  <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+                </div>
+                <div>
+                  <h3 class="text-xs font-black text-slate-200">شارات وجوائز ريادي الغد</h3>
+                  <p class="text-[9px] text-slate-500">شارات مستهدفة تفتح تلقائياً بنسب الإنجاز بالمسابقة</p>
+                </div>
+              </div>
+
+              <!-- Badges layout grid container -->
+              <div id="quiz-earned-badges-root" class="grid grid-cols-2 gap-3.5">
+                <!-- Static and dynamic tags populated by JS -->
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 py-6 bg-slate-950 text-slate-600 text-center text-[10px] select-none">
+      <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2 font-sans font-medium">
+        <p>© 2026 مبادرة "ريادي الغد" المدرسية لطلاب الصيد الصفي والقيادة المالية الواعدة.</p>
+        <p class="text-slate-500">تم التطوير بالفصحى لتجارب وبازارات حقيقية ناجحة.</p>
+      </div>
+    </footer>
+
+    <!-- Core App Logic Link -->
+    <script type="module" src="/src/app.js"></script>
+
   </body>
 </html>
-
