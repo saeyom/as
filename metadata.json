@@ -1,0 +1,6 @@
+{
+  "name": "ريادي الغد - ريادة الأعمال والإدارة المالية",
+  "description": "منصة تفاعلية وعرض تقديمي راقٍ لطلاب المدارس حول مبادئ ريادة الأعمال وتخطيط المشاريع خطوة بخطوة، مع حاسبة مالية تفاعلية وإمكانية التصدير المباشر لعروض Google Slides.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
